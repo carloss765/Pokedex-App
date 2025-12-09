@@ -77,6 +77,12 @@ function PokemonItem({
 export default function Index() {
   const pokemons = useFetchPokemons()
   const [showModal, setShowModal] = useState(false)
+  const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null)
+
+  const handlePokemonPress = (pokemon: Pokemon) => {
+    setSelectedPokemon(pokemon)
+    setShowModal(true)
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -84,10 +90,16 @@ export default function Index() {
         <PokemonItem
           key={pokemon.name}
           pokemon={pokemon}
-          onPress={() => setShowModal(true)}
+          onPress={() => handlePokemonPress(pokemon)}
         />
       ))}
-      {showModal && <Modal showModal={showModal} setShowModal={setShowModal} />}
+      {showModal && selectedPokemon && (
+        <Modal
+          showModal={showModal}
+          setShowModal={setShowModal}
+          pokemon={selectedPokemon}
+        />
+      )}
     </ScrollView>
   );
 }
