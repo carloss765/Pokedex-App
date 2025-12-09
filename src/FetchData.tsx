@@ -9,10 +9,54 @@ interface PokemonsResponse {
   results: Pokemon[];
 }
 
-interface PokemonDetail {
-  sprites: {
-    front_default: string;
+// Interfaces para los detalles del pokémon
+export interface Sprites {
+  front_default: string;
+  back_default: string;
+  front_shiny: string;
+  back_shiny: string;
+  front_female: string | null;
+  back_female: string | null;
+  front_shiny_female: string | null;
+  back_shiny_female: string | null;
+}
+
+export interface PokemonType {
+  slot: number;
+  type: {
+    name: string;
+    url: string;
   };
+}
+
+export interface PokemonStat {
+  base_stat: number;
+  effort: number;
+  stat: {
+    name: string;
+    url: string;
+  };
+}
+
+export interface PokemonAbility {
+  ability: {
+    name: string;
+    url: string;
+  };
+  is_hidden: boolean;
+  slot: number;
+}
+
+export interface PokemonDetail {
+  id: number;
+  name: string;
+  height: number;
+  weight: number;
+  base_experience: number;
+  sprites: Sprites;
+  types: PokemonType[];
+  stats: PokemonStat[];
+  abilities: PokemonAbility[];
 }
 export const fetchPokemons = async (): Promise<Pokemon[]> => {
   try {
@@ -36,29 +80,30 @@ export const useFetchPokemons = () => {
   return pokemons
 }
 
-export const useFetchSprite = (url: string) => {
-  const [sprite, setSprite] = useState<string | null>(null)
+// Hook para obtener todos los detalles de un pokémon
+export const useFetchDetails = (url: string) => {
+  const [details, setDetails] = useState<PokemonDetail | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
-    const fetchSprite = async () => {
+    const fetchDetails = async () => {
       try {
         setLoading(true)
         const res = await fetch(url)
         const data: PokemonDetail = await res.json()
-        setSprite(data.sprites.front_default)
+        setDetails(data)
       } catch (error) {
-        console.error('Error fetching sprite:', error)
-        setSprite(null)
+        console.error('Error fetching pokemon details:', error)
+        setDetails(null)
       } finally {
         setLoading(false)
       }
     }
 
     if (url) {
-      fetchSprite()
+      fetchDetails()
     }
   }, [url])
 
-  return { sprite, loading }
+  return { details, loading }
 }
