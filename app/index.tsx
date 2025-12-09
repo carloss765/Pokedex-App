@@ -1,39 +1,46 @@
 import { Pokemon, useFetchDetails, useFetchPokemons } from "@/src/FetchData";
-import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import Modal from "./modal";
 
 // Mapeo de colores por tipo de pokémon
 const TYPE_COLORS: Record<string, string> = {
-  normal:   '#CFCFB5',
-  fire:     '#F6A56D',
-  water:    '#93B4F6',
+  normal: '#CFCFB5',
+  fire: '#F6A56D',
+  water: '#93B4F6',
   electric: '#FAE67D',
-  grass:    '#9FDE87',
-  ice:      '#C4F0F0',
+  grass: '#9FDE87',
+  ice: '#C4F0F0',
   fighting: '#D96B65',
-  poison:   '#C47AC4',
-  ground:   '#E8D7A1',
-  flying:   '#CFC3F8',
-  psychic:  '#FBA9C6',
-  bug:      '#C8D25E',
-  rock:     '#D2C68A',
-  ghost:    '#9E8AC3',
-  dragon:   '#A08AFA',
-  dark:     '#9B8B76',
-  steel:    '#D6D6E8',
-  fairy:    '#F7C1D0',
+  poison: '#C47AC4',
+  ground: '#E8D7A1',
+  flying: '#CFC3F8',
+  psychic: '#FBA9C6',
+  bug: '#C8D25E',
+  rock: '#D2C68A',
+  ghost: '#9E8AC3',
+  dragon: '#A08AFA',
+  dark: '#9B8B76',
+  steel: '#D6D6E8',
+  fairy: '#F7C1D0',
 };
 
 // Componente para mostrar un pokémon con sus detalles completos
-function PokemonItem({ pokemon }: { pokemon: Pokemon }) {
+function PokemonItem({
+  pokemon,
+  onPress
+}: {
+  pokemon: Pokemon;
+  onPress: () => void;
+}) {
   const { details, loading } = useFetchDetails(pokemon.url)
-
   // Obtener el color basado en el primer tipo del pokémon
   const backgroundColor = details?.types[0]?.type.name
     ? TYPE_COLORS[details.types[0].type.name] || '#f5f5f5'
     : '#f5f5f5'
 
   return (
-    <View style={[styles.pokemonItem, { backgroundColor }]}>
+    <TouchableOpacity style={[styles.pokemonItem, { backgroundColor }]} onPress={onPress}>
       <Text style={styles.pokemonName}>{pokemon.name}</Text>
       {loading ? (
         <ActivityIndicator size="small" color="#ffffff" />
@@ -63,18 +70,24 @@ function PokemonItem({ pokemon }: { pokemon: Pokemon }) {
       ) : (
         <Text style={styles.noDataText}>No data available</Text>
       )}
-    </View>
+    </TouchableOpacity>
   )
 }
 
 export default function Index() {
   const pokemons = useFetchPokemons()
+  const [showModal, setShowModal] = useState(false)
 
   return (
     <ScrollView style={styles.container}>
       {pokemons.map((pokemon) => (
-        <PokemonItem key={pokemon.name} pokemon={pokemon} />
+        <PokemonItem
+          key={pokemon.name}
+          pokemon={pokemon}
+          onPress={() => setShowModal(true)}
+        />
       ))}
+      {showModal && <Modal showModal={showModal} setShowModal={setShowModal} />}
     </ScrollView>
   );
 }
